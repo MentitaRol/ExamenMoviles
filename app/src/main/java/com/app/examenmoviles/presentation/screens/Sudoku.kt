@@ -2,10 +2,13 @@ package com.app.examenmoviles.presentation.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -61,6 +65,20 @@ fun SudokuScreen(
                         .padding(padding),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+
+                    Row {
+                        Button(onClick = { viewModel.resetSudoku() }) {
+                            Text("Reiniciar")
+                        }
+                        Spacer(Modifier.width(12.dp))
+                        Button(onClick = { viewModel.loadNewGame() }) {
+                            Text("Nuevo Juego")
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+
                     NumberPad(onValueChange = {
                         viewModel.onCellValueChanged(it)
                     })
@@ -74,6 +92,21 @@ fun SudokuScreen(
                         onSelectCell = { r, c -> viewModel.onCellSelected(r, c) },
                         onValueChange = { value -> viewModel.onCellValueChanged(value) }
                     )
+
+                    Button(onClick = { viewModel.verifySolution() }) {
+                        Text("Verificar solución")
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    uiState.message?.let { msg ->
+                        Text(
+                            text = msg,
+                            modifier = Modifier.padding(8.dp),
+                            color = if (msg.contains("incorrecta")) Color.Red else Color(0xFF2E7D32)
+                        )
+                    }
+
                 }
             }
         }

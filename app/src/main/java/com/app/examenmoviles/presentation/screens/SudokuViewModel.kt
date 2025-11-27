@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.examenmoviles.domain.common.Result
 import com.app.examenmoviles.domain.usecase.SudokuUseCase
+import com.app.examenmoviles.domain.usecase.CheckSolutionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SudokuViewModel @Inject constructor(
-    private val sudokuUseCase: SudokuUseCase
+    private val sudokuUseCase: SudokuUseCase,
+    private val checkSolutionUseCase: CheckSolutionUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SudokuUiState())
     val uiState: StateFlow<SudokuUiState> = _uiState
@@ -37,7 +39,8 @@ class SudokuViewModel @Inject constructor(
                         is Result.Success -> {
                             state.copy(
                                 isLoading = false,
-                                puzzle = result.data.puzzle,
+                                puzzle = result.data.puzzle.map { it.toMutableList() },
+                                initialPuzzle = result.data.puzzle,
                                 solution = result.data.solution,
                                 error = null
                             )
@@ -46,7 +49,7 @@ class SudokuViewModel @Inject constructor(
                         is Result.Error -> {
                             state.copy(
                                 isLoading = false,
-                                error = result.exception.message ?: "Unknown error"
+                                error = result.exception.message ?: "Error desconocido"
                             )
                         }
                     }
@@ -62,8 +65,12 @@ class SudokuViewModel @Inject constructor(
     }
 
     fun onCellValueChanged(newValue: Int?) {
+        val state = _uiState.value
+
         val row = uiState.value.selectedRow ?: return
         val col = uiState.value.selectedCol ?: return
+
+        if (state.initialPuzzle[row][col] != null) return
 
         val updatedPuzzle = uiState.value.puzzle.mapIndexed { r, rowList ->
             rowList.mapIndexed { c, value ->
@@ -72,5 +79,43 @@ class SudokuViewModel @Inject constructor(
         }
 
         _uiState.update { it.copy(puzzle = updatedPuzzle) }
+    }
+
+    fun verifySolution() {
+        val state = _uiState.value
+
+        val isCorrect = checkSolutionUseCase(
+            current = state.puzzle,
+            solution = state.solution
+        )
+
+        _uiState.update {
+            it.copy(
+                message = if (isCorrect)
+                    "¡La solución es correcta!"
+                else
+                    "La solución es incorrecta. Sigue intentando."
+            )
+        }
+    }
+
+    fun resetSudoku(){
+        val state = _uiState.value
+        val resetPuzzle = state.initialPuzzle.map { row ->
+            row.map { it }.toMutableList()
+        }
+        _uiState.update {
+            it.copy(
+                puzzle = resetPuzzle,
+                selectedRow = null,
+                selectedCol = null,
+                message = null
+            )
+        }
+
+    }
+
+    fun loadNewGame(){
+        loadSudokuGame()
     }
 }
