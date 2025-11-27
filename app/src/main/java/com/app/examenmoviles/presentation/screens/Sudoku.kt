@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.app.examenmoviles.presentation.common.components.ErrorView
 import com.app.examenmoviles.presentation.screens.components.NumberPad
 import com.app.examenmoviles.presentation.screens.components.SudokuBoard
 
@@ -52,9 +53,9 @@ fun SudokuScreen(
             }
 
             uiState.error != null -> {
-                Text(
-                    text = uiState.error!!,
-                    modifier = Modifier.padding(16.dp)
+                ErrorView(
+                    message = uiState.error ?: "Unknown error",
+                    onRetry = { viewModel.loadNewGame() },
                 )
             }
 
