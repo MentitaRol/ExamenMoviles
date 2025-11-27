@@ -9,7 +9,6 @@ import retrofit2.http.Query
 interface SudokuApi{
     @GET("sudokugenerate")
     suspend fun getSudokuGame(
-        @Header("X-Api-Key") apiKey: String,
         @Query("width") width: Int = 4,
         @Query("height") height: Int = 4,
         @Query("difficulty") difficulty: String = "easy",
