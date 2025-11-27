@@ -1,11 +1,15 @@
 package com.app.examenmoviles.di
 
+import android.content.Context
+import com.app.examenmoviles.data.local.preferences.SudokuPreferences
 import com.app.examenmoviles.data.remote.api.SudokuApi
 import com.app.examenmoviles.data.repository.SudokuRepositoryImpl
 import com.app.examenmoviles.domain.repository.SudokuRepository
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -26,15 +30,32 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideGson(): Gson {
+        return Gson()
+    }
+
+    @Provides
+    @Singleton
     fun provideSudokuApi(retrofit: Retrofit): SudokuApi {
         return retrofit.create(SudokuApi::class.java)
     }
 
     @Provides
     @Singleton
+    fun provideSudokuPreferences(
+        @ApplicationContext context: Context,
+        gson: Gson
+    ): SudokuPreferences {
+        return SudokuPreferences(context, gson)
+    }
+
+
+    @Provides
+    @Singleton
     fun provideSudokuRepository(
-        api: SudokuApi
+        api: SudokuApi,
+        preferences: SudokuPreferences
     ): SudokuRepository {
-        return SudokuRepositoryImpl(api)
+        return SudokuRepositoryImpl(api, preferences)
     }
 }

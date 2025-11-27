@@ -66,6 +66,10 @@ fun SudokuScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
+                    Button(onClick = { viewModel.loadSavedGame() }) {
+                        Text("Continuar partida")
+                    }
+
                     Row {
                         Button(onClick = { viewModel.resetSudoku() }) {
                             Text("Reiniciar")
