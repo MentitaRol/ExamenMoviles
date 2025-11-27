@@ -56,6 +56,8 @@ class SudokuViewModel @Inject constructor(
     }
 
     fun onCellSelected(row: Int, col: Int) {
+        val puzzle = _uiState.value.puzzle
+        if (puzzle[row][col] != null) return
         _uiState.update { it.copy(selectedRow = row, selectedCol = col) }
     }
 

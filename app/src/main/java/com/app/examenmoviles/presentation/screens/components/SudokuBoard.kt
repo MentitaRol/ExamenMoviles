@@ -2,10 +2,8 @@ package com.app.examenmoviles.presentation.screens.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,9 +25,11 @@ fun SudokuBoard(
         puzzle.forEachIndexed { rowIndex, row ->
             Row(Modifier.weight(1f)) {
                 row.forEachIndexed { colIndex, value ->
+                    val isInitial = value != null
                     SudokuCell(
                         value = value,
                         isSelected = rowIndex == selectedRow && colIndex == selectedCol,
+                        isInitial = isInitial,
                         onClick = { onSelectCell(rowIndex, colIndex) },
                         modifier = Modifier
                             .weight(1f)
@@ -39,8 +39,4 @@ fun SudokuBoard(
             }
         }
     }
-
-    Spacer(Modifier.height(16.dp))
-
-    NumberPad(onValueChange)
 }
